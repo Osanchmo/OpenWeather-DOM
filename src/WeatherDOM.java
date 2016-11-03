@@ -2,10 +2,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 
@@ -47,6 +49,27 @@ public class WeatherDOM {
 
             //deixem un espai al final de cada node
             System.out.println("");
+
+            //a la vegada que ho mostrem ho anem passant a un nou fitxer apartat B
+            windSpeed.setAttribute("kph",String.valueOf(vel));
+
+            try {
+                //iniciem Transformer a partir d'un transfomerFactory
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                //Definim les propietats de sortida (generalment predefinides d'aquesta forma)
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "5");
+                //marquem el document d'origen
+                DOMSource source = new DOMSource(doc);
+                //marquem el nou document
+                StreamResult result = new StreamResult(new File("ForecastNew.xml"));
+                //iniciem la transformació
+                transformer.transform(source, result);
+
+            } catch (TransformerException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
